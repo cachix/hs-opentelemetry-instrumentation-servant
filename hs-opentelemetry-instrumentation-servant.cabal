@@ -19,7 +19,7 @@ common warnings
 library
     import:           warnings
     exposed-modules:  OpenTelemetry.Instrumentation.Servant
-    other-modules:    OpenTelemetry.Instrumentation.Servant.Internal
+                    , OpenTelemetry.Instrumentation.Servant.Internal
     -- other-extensions:
     build-depends:    base < 5
                     , hs-opentelemetry-api ==0.1.*

@@ -106,7 +106,7 @@ instance (HasEndpoint (sub :: Type)) => HasEndpoint (Header' mods h a :> sub) wh
 
 #if MIN_VERSION_servant(0,18,2)
 instance HasEndpoint (sub :: Type) => HasEndpoint (Fragment a :> sub) where
-    getEndpoint _ = getEndpoint (Proxy :: Proxy sub)
+  getEndpoint _ = getEndpoint (Proxy :: Proxy sub)
 #endif
 
 instance (HasEndpoint (sub :: Type)) => HasEndpoint (QueryParam' mods (h :: Symbol) a :> sub) where
@@ -123,7 +123,7 @@ instance (HasEndpoint (sub :: Type)) => HasEndpoint (ReqBody' mods cts a :> sub)
 
 #if MIN_VERSION_servant(0,15,0)
 instance HasEndpoint (sub :: Type) => HasEndpoint (StreamBody' mods framing ct a :> sub) where
-    getEndpoint _ = getEndpoint (Proxy :: Proxy sub)
+  getEndpoint _ = getEndpoint (Proxy :: Proxy sub)
 #endif
 
 instance (HasEndpoint (sub :: Type)) => HasEndpoint (RemoteHost :> sub) where
@@ -151,22 +151,22 @@ instance (ReflectMethod method) => HasEndpoint (Verb method status cts a) where
 
 #if MIN_VERSION_servant(0,17,0)
 instance ReflectMethod method => HasEndpoint (NoContentVerb method) where
-    getEndpoint _ req =
-      case pathInfo req of
-        [] | requestMethod req == method -> Just (ServantEndpoint method [] )
-        _ -> Nothing
-      where 
-        method = reflectMethod (Proxy :: Proxy method)
+  getEndpoint _ req =
+    case pathInfo req of
+      [] | requestMethod req == method -> Just (ServantEndpoint method [] )
+      _ -> Nothing
+    where
+      method = reflectMethod (Proxy :: Proxy method)
 #endif
 
 #if MIN_VERSION_servant(0,18,1)
 instance ReflectMethod method => HasEndpoint (UVerb method contentType as) where
-    getEndpoint _ req =
-      case pathInfo req of
-        [] | requestMethod req == method -> Just (ServantEndpoint method [] )
-        _ -> Nothing
-      where
-        method = reflectMethod (Proxy :: Proxy method)
+  getEndpoint _ req =
+    case pathInfo req of
+      [] | requestMethod req == method -> Just (ServantEndpoint method [] )
+      _ -> Nothing
+    where
+      method = reflectMethod (Proxy :: Proxy method)
 #endif
 
 instance (ReflectMethod method) => HasEndpoint (Stream method status framing ct a) where

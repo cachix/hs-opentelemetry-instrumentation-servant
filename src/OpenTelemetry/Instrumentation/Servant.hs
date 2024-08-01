@@ -6,11 +6,12 @@ import qualified Data.HashMap.Strict as H
 import Data.Proxy (Proxy (..))
 import Data.Text (Text)
 import qualified Data.Text as T
+import Data.Text.Encoding (decodeLatin1)
 import Network.Wai (Middleware)
 import qualified OpenTelemetry.Context as Context
 import OpenTelemetry.Instrumentation.Servant.Internal
   ( HasEndpoint (getEndpoint),
-    ServantEndpoint (pathSegments),
+    ServantEndpoint (method, pathSegments),
   )
 import OpenTelemetry.Instrumentation.Wai (requestContext)
 import OpenTelemetry.Trace.Core
@@ -43,7 +44,7 @@ openTelemetryServantMiddleware tp api = do
                 H.fromList
                   [ ("http.framework", toAttribute ("servant" :: Text)),
                     ("http.route", toAttribute routeName),
-                    ("http.method", toAttribute (method endpoint))
+                    ("http.method", toAttribute $ decodeLatin1 (method endpoint))
                   ]
               args =
                 defaultSpanArguments

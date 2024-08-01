@@ -14,13 +14,13 @@ import UnliftIO.Exception (bracket)
 port :: Int
 port = 4567
 
-type Api = "hello" :> Capture "name" Text :> QueryParam "extra" Text :> Get '[JSON] Text
+type Api = "hello" :> Capture "name" Text :> Get '[JSON] Text
 
 api :: Proxy Api
 api = Proxy
 
 server :: Server Api
-server name extra = return (name <> maybe "" (" " <>) extra)
+server name = return $ "hello, " <> name <> "!"
 
 main :: IO ()
 main = withTracerProvider $ \tracerProvider -> do

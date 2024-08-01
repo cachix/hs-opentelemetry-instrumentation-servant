@@ -24,6 +24,8 @@ In this case, `there` is replaced by `:name`.
 | ------------- | ------------ |
 | hello/there   | hello/:name  |
 
+The WAI middleware will detect this attribute and will use it to update the name of the entire span.
+
 The main use-cases for this are to:
 
 1. Filter traces by endpoint.

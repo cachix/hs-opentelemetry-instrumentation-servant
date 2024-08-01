@@ -1,17 +1,23 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 
 {
   languages.haskell.enable = true;
 
-  processes = {
-    opentelemetry-collector.exec =
-      "${lib.getExe pkgs.opentelemetry-collector-contrib} --config ./exe/otelconfig.yaml";
-    # Run the executable in exe
-    server.exec = "${lib.getExe pkgs.haskellPackages.ghcid} -c 'cabal repl exe:server' --test 'main'";
-  };
-
   packages = [
-    pkgs.ormolu
+    pkgs.ghcid
     pkgs.opentelemetry-collector-contrib
   ];
+
+  pre-commit.hooks = {
+    ormolu.enable = true;
+    nixpkgs-fmt.enable = true;
+  };
+
+  processes = {
+    opentelemetry-collector.exec =
+      "otelcontribcol --config ./exe/otelconfig.yaml";
+
+    server.exec =
+      "ghcid -c 'cabal repl exe:server' --test main";
+  };
 }

@@ -22,7 +22,7 @@ library
                     , OpenTelemetry.Instrumentation.Servant.Internal
     -- other-extensions:
     build-depends:    base < 5
-                    , hs-opentelemetry-api ==0.1.*
+                    , hs-opentelemetry-api ==0.2.*
                     , hs-opentelemetry-instrumentation-wai
                     , http-types
                     , servant

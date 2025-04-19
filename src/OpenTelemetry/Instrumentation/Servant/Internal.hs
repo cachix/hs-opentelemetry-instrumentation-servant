@@ -8,6 +8,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
 
+-- NOTE: This is required in implementing HasEndpoint instance for NamedRoutes.
+#if MIN_VERSION_servant(0,19,0)
+{-# LANGUAGE UndecidableInstances #-}
+#endif
+
 -- Adapted from https://github.com/haskell-servant/servant-ekg
 --
 -- Copyright (c) 2015, Anchor Systems
@@ -185,3 +190,8 @@ instance (HasEndpoint (sub :: Type)) => HasEndpoint (CaptureAll (h :: Symbol) a 
 
 instance (HasEndpoint (sub :: Type)) => HasEndpoint (BasicAuth (realm :: Symbol) a :> sub) where
   getEndpoint _ = getEndpoint (Proxy :: Proxy sub)
+
+#if MIN_VERSION_servant(0,19,0)
+instance (HasEndpoint (ToServantApi api)) => HasEndpoint (NamedRoutes api) where
+  getEndpoint _ req = getEndpoint (Proxy :: Proxy (ToServantApi api)) req
+#endif

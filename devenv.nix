@@ -15,7 +15,7 @@
 
   processes = {
     opentelemetry-collector.exec =
-      "otelcontribcol --config ./exe/otelconfig.yaml";
+      "otelcol-contrib --config ./exe/otelconfig.yaml";
 
     server.exec =
       "ghcid -c 'cabal repl exe:server' --test main";

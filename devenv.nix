@@ -8,16 +8,14 @@
     pkgs.opentelemetry-collector-contrib
   ];
 
-  pre-commit.hooks = {
+  git-hooks.hooks = {
     ormolu.enable = true;
-    nixpkgs-fmt.enable = true;
+    nixfmt.enable = true;
   };
 
   processes = {
-    opentelemetry-collector.exec =
-      "otelcol-contrib --config ./exe/otelconfig.yaml";
+    opentelemetry-collector.exec = "otelcol-contrib --config ./exe/otelconfig.yaml";
 
-    server.exec =
-      "ghcid -c 'cabal repl exe:server' --test main";
+    server.exec = "ghcid -c 'cabal repl exe:server' --test main";
   };
 }

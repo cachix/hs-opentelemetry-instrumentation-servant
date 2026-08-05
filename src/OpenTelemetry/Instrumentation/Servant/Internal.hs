@@ -60,6 +60,9 @@ import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
 import Network.HTTP.Types (Method)
 import Network.Wai (Request (..))
 import Servant.API
+#if MIN_VERSION_servant(0,20,3)
+import Servant.API.MultiVerb (MultiVerb)
+#endif
 
 data ServantEndpoint = ServantEndpoint
   { method :: Method,
@@ -174,6 +177,16 @@ instance ReflectMethod method => HasEndpoint (UVerb method contentType as) where
       method = reflectMethod (Proxy :: Proxy method)
 #endif
 
+#if MIN_VERSION_servant(0,20,3)
+instance ReflectMethod method => HasEndpoint (MultiVerb method contentTypes as responses) where
+  getEndpoint _ req =
+    case pathInfo req of
+      [] | requestMethod req == method -> Just (ServantEndpoint method [] )
+      _ -> Nothing
+    where
+      method = reflectMethod (Proxy :: Proxy method)
+#endif
+
 instance (ReflectMethod method) => HasEndpoint (Stream method status framing ct a) where
   getEndpoint _ req =
     case pathInfo req of
@@ -189,6 +202,10 @@ instance (HasEndpoint (sub :: Type)) => HasEndpoint (CaptureAll (h :: Symbol) a 
   getEndpoint _ = getEndpoint (Proxy :: Proxy sub)
 
 instance (HasEndpoint (sub :: Type)) => HasEndpoint (BasicAuth (realm :: Symbol) a :> sub) where
+  getEndpoint _ = getEndpoint (Proxy :: Proxy sub)
+
+-- 'AuthProtect' is poly-kinded upstream, so the tag is left unconstrained here.
+instance (HasEndpoint (sub :: Type)) => HasEndpoint (AuthProtect tag :> sub) where
   getEndpoint _ = getEndpoint (Proxy :: Proxy sub)
 
 #if MIN_VERSION_servant(0,19,0)

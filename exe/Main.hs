@@ -3,6 +3,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
 
+import Data.Functor (void)
 import Data.Text (Text)
 import Network.Wai.Handler.Warp as Warp
 import OpenTelemetry.Instrumentation.Servant (openTelemetryServantMiddleware)
@@ -35,4 +36,4 @@ main = withTracerProvider $ \tracerProvider -> do
 
 withTracerProvider :: (TracerProvider -> IO a) -> IO a
 withTracerProvider =
-  bracket initializeGlobalTracerProvider shutdownTracerProvider
+  bracket initializeGlobalTracerProvider (void . (`shutdownTracerProvider` Nothing))

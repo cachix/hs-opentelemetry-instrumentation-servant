@@ -8,12 +8,19 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Text.Encoding (decodeLatin1)
 import Network.Wai (Middleware)
+import OpenTelemetry.Attributes.Key (unkey)
 import qualified OpenTelemetry.Context as Context
 import OpenTelemetry.Instrumentation.Servant.Internal
   ( HasEndpoint (getEndpoint),
     ServantEndpoint (method, pathSegments),
   )
 import OpenTelemetry.Instrumentation.Wai (requestContext)
+import qualified OpenTelemetry.SemanticConventions as SC
+import OpenTelemetry.SemanticsConfig
+  ( StabilityOpt (Old, Stable, StableAndOld),
+    getSemanticsOptions,
+    httpOption,
+  )
 import OpenTelemetry.Trace.Core
   ( SpanArguments (attributes, kind),
     SpanKind (Internal, Server),
@@ -39,13 +46,23 @@ openTelemetryServantMiddleware tp api = do
         Just endpoint -> do
           let mspan = requestContext request >>= Context.lookupSpan
 
+          semanticsOptions <- getSemanticsOptions
           let routeName = T.intercalate "/" $ pathSegments endpoint
-              sharedAttributes =
-                H.fromList
-                  [ ("http.framework", toAttribute ("servant" :: Text)),
-                    ("http.route", toAttribute routeName),
-                    ("http.method", toAttribute $ decodeLatin1 (method endpoint))
+              methodName = decodeLatin1 (method endpoint)
+              baseAttributes =
+                [ ("http.framework", toAttribute ("servant" :: Text)),
+                  (unkey SC.http_route, toAttribute routeName)
+                ]
+              methodAttributes = case httpOption semanticsOptions of
+                Stable ->
+                  [(unkey SC.http_request_method, toAttribute methodName)]
+                StableAndOld ->
+                  [ (unkey SC.http_request_method, toAttribute methodName),
+                    (unkey SC.http_method, toAttribute methodName)
                   ]
+                Old ->
+                  [(unkey SC.http_method, toAttribute methodName)]
+              sharedAttributes = H.fromList (baseAttributes <> methodAttributes)
               args =
                 defaultSpanArguments
                   { kind = maybe Server (const Internal) mspan,
